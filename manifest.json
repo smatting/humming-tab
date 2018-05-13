@@ -3,7 +3,7 @@
   "description": "A fast search-based tab switcher",
   "version": "0.0.1",
   "background": { "scripts": ["background.js"] },
-  "permissions": ["tabs"],
+  "permissions": ["tabs", "storage"],
   "browser_action": {
       "name": "Click to open the tab search"
   },

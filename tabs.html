@@ -1,3 +1,16 @@
 <html>
-    <body>Hi there!</body>
+    <head>
+        <script src="lodash.min.js"></script>
+        <script src="vue.js"></script>
+        <script src="view.js"></script>
+    </head>
+    <body>
+        <div id="tab-view">
+            <ol>
+                <li v-for="tab in tabs">
+                    <a href="{{ tab.url }}">{{ tab.title }}</a>
+                </li>
+            </ol>
+        </div>
+    </body>
 </html>

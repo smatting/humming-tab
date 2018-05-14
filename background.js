@@ -13,6 +13,10 @@ function openSearch() {
         if (tab) {
           console.log("found tab", tab);
           chrome.tabs.highlight({tabs: [tab.index]});
+
+          console.log('houston you read me?');
+          chrome.runtime.sendMessage(null, {"bottle": "send nudes"});
+
         } else {
           openTab();
         }
@@ -24,8 +28,6 @@ function openSearch() {
     }
     // console.log('stored tab id', data);
   });
-
-
   // const extensionId = chrome.i18n.getMessage("@@extension_id");
   // const urlPattern = "chrome-extension://" + extensionId + "/tabs.html";
   // const urlPattern = "*://*/tabs.html";
@@ -42,12 +44,9 @@ function openSearch() {
   // chrome.tabs.highlight({tabs: 1});
 }
 
-// function updateIcon() {
-//   chrome.browserAction.setIcon({path:"icon" + current + ".png"});
-//   current++;
+function updateTabView() {
 
-//   if (current > max)
-//     current = min;
-// }
+};
 
 chrome.browserAction.onClicked.addListener(openSearch);
+

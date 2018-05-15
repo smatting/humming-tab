@@ -1,6 +1,6 @@
 
 function openTab() {
-  chrome.tabs.create({url: "tabs.html"}, function(tab) {
+  chrome.tabs.create({url: "tabs.html", pinned: true}, function(tab) {
     chrome.storage.local.set({tabsTabId: tab.id});
   });
 }
@@ -11,10 +11,10 @@ function openSearch() {
       // chrome.tabs.highlight({tabs: 1});
       chrome.tabs.get(data.tabsTabId, function(tab) {
         if (tab) {
-          console.log("found tab", tab);
+          // console.log("found tab", tab);
           chrome.tabs.highlight({tabs: [tab.index]});
 
-          console.log('houston you read me?');
+          // console.log('houston you read me?');
           chrome.runtime.sendMessage(null, {"bottle": "send nudes"});
 
         } else {

@@ -50,3 +50,13 @@ function updateTabView() {
 
 chrome.browserAction.onClicked.addListener(openSearch);
 
+function onTabActivated(activeInfo) {
+  chrome.storage.local.get({tabsLastActive: {}}, function(data) {
+    console.log('tabsLastActive', data.tabsLastActive);
+    data.tabsLastActive[activeInfo.tabId] = (+ new Date());
+    chrome.storage.local.set({tabsLastActive: data.tabsLastActive});
+  });
+}
+
+chrome.tabs.onActivated.addListener(onTabActivated);
+

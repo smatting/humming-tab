@@ -9,18 +9,6 @@
   src: local('Font Awesome 5 Free'), url("../webfonts/fa-solid-900.woff") format('woff');
 }
 
-@font-face {
-  font-family: 'Open Sans';
-  font-style: normal;
-  font-weight: 300;
-  src: local('Open Sans'), local('OpenSans'), url("../webfonts/OpenSans-Light-webfont.woff") format('woff');
-}
-
-.blubb {
-  font-family: 'Open Sans';
-  font-weight: 300; 
-}
-
 .fa,
 .fas {
   font-family: 'Font Awesome 5 Free';

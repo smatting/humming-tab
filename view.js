@@ -6,6 +6,13 @@ document.addEventListener('DOMContentLoaded', function(){
             tabs: []
         },
         methods: {
+            closeTab: function(tabId, event) {
+                const that = this;
+                chrome.tabs.remove(tabId, function() {
+                    console.log('tabs inside closeTab', that.tabs);
+                    that.tabs = _.filter(that.tabs, function(tab) {return tab.id !== tabId});
+                });
+            },
             switchToTab: function(tabid) {
                 console.log('switchToTab method', tabid);
                 chrome.tabs.get(tabid, function(tab) {
@@ -20,11 +27,27 @@ document.addEventListener('DOMContentLoaded', function(){
         }
     });
 
+    function timeSinceLastActive(now, tabsLastActive) {
+        return function(tab) {
+            const t = tabsLastActive[tab.id];
+            if (t !== undefined) {
+                return now - t;
+            } else {
+                return 1000000000000;
+            }
+        };
+    };
+
     function updateTabView() {
         console.log('updateTabView');
         chrome.tabs.query({}, function(tabs) {
-            console.log(tabs);
-            app.tabs = tabs;
+            chrome.storage.local.get({tabsLastActive: {}}, function(data) {
+                const now = (+ new Date());
+                var tabsFiltered = _.filter(tabs, function(tab) {return tab.url != window.location.href;});
+                console.log('tabsFiltered', tabsFiltered);
+                const tabsSorted = _.sortBy(tabsFiltered, timeSinceLastActive(now, data.tabsLastActive))
+                app.tabs = tabsSorted;
+            });
         });
         // chrome.storage.local.get({tabs: {}}, function(data) {
         //     console.log('tabs read', data.tabs);

@@ -3,9 +3,16 @@ document.addEventListener('DOMContentLoaded', function(){
         el: '#tab-view',
         data: {
             message: 'Hello Vue!',
-            tabs: []
+            tabs: [],
+            keyboardSelectionIndex: 0
         },
         methods: {
+            moveKeyboardSelection: function(delta) {
+                const i = this.keyboardSelectionIndex;
+                const n = _.size(this.tabs);
+                const iNext = Math.min((Math.max(i + delta, 0)), n-1);
+                this.keyboardSelectionIndex = iNext;
+            },
             closeTab: function(tabId, event) {
                 const that = this;
                 chrome.tabs.remove(tabId, function() {
@@ -23,6 +30,13 @@ document.addEventListener('DOMContentLoaded', function(){
                     console.log("did not find tab", tabid);
                     }
                 });
+            },
+            switchToSelectedTab: function() {
+                const i = this.keyboardSelectionIndex;
+                const n = _.size(this.tabs);
+                if ((0 < i) && (i < n)) {
+                    this.switchToTab(this.tabs[i].id);
+                }
             }
         }
     });
@@ -39,6 +53,8 @@ document.addEventListener('DOMContentLoaded', function(){
     };
 
     function updateTabView() {
+        app.keyboardSelectionIndex = 0;
+
         console.log('updateTabView');
         chrome.tabs.query({}, function(tabs) {
             chrome.storage.local.get({tabsLastActive: {}}, function(data) {
@@ -70,6 +86,24 @@ document.addEventListener('DOMContentLoaded', function(){
         // console.log('We read you', message);
         updateTabView();
     });
+
+    window.addEventListener("keydown", function(e) {
+        console.log('keydown', e.keyCode);
+        if (e.keyCode == 38) {
+            e.preventDefault();
+            e.stopPropagation();
+            app.moveKeyboardSelection(-1);
+        }
+        if (e.keyCode == 40) {
+            e.preventDefault();
+            e.stopPropagation();
+            app.moveKeyboardSelection(1);
+        }
+        if (e.keyCode == 13) {
+            app.switchToSelectedTab();
+        }
+    });
+
 
     updateTabView();
 }, false);

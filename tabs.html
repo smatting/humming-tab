@@ -10,9 +10,10 @@
     </head>
     <body>
         <div id="tab-view">
+            <input id="tab-search" type="text" v-on:input='onSearchInput($event.target.value)'  spellcheck="false" placeholder="Search open tabs">
             <ol>
                 <li v-for="(tab, index) in tabs" v-bind:class="{tab: true, selected: index == keyboardSelectionIndex}" v-on:click="switchToTab(tab.id)" >
-                    <span class="tab-close-button" v-on:click.stop="closeTab(tab.id)"><i class="fas fa-times-circle"></i></span><span class="tab-icon" v-bind:style="'background-image: url(' + tab.favIconUrl + ')'"></span><span class="tab-title" class="tab-link" v-bind:data-tabid="tab.id">{{ tab.title }}</span>
+                    <span class="tab-close-button" v-on:click.stop="closeTab(tab.id)"><i class="fas fa-times-circle"></i></span><span class="tab-icon-wrap"><span class="tab-icon" v-bind:style="'background-image: url(' + tab.favIconUrl + ')'"></span></span><span class="tab-title" class="tab-link" v-bind:data-tabid="tab.id">{{ tab.title }}</span>
                 </li>
             </ol>
         </div>

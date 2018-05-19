@@ -53,6 +53,7 @@ body {
 .tab-icon-wrap {
     display: table-cell;
     width: 30px;
+    text-align: right;
 }
 
 .tab-icon {
@@ -70,10 +71,11 @@ body {
 
 .tab-close-button {
     display: table-cell;
-    width: 40px;
+    width: 30px;
     text-align: center;
 
     /* border: 1px solid green; */
+    margin-right: 10px;
     /* width: 100px; */
 
     /* vertical-align: center;

@@ -43,8 +43,13 @@ body {
     /* line-height: 1.7em; */
     padding: 0.5em 0px;
 }
+.tab:hover {
+     background-color: #d9e1eb;
+     /* border-radius: 5px; */
+    /* background-color:#dcbc83; */
+}
 
-.tab.selected, .tab:hover {
+.tab.selected {
      background-color: #b6d2f7;
      /* border-radius: 5px; */
     /* background-color:#dcbc83; */
@@ -54,6 +59,15 @@ body {
     display: table-cell;
     width: 30px;
     text-align: right;
+}
+
+.highlight {
+    /* font-weight: bold; */
+    /* background-color: rgba(0, 0, 0, 0.3); */
+    /* font-weight: bold; */
+    /* text-decoration: underline; */
+    color: green;
+    /* border-radius: 5px; */
 }
 
 .tab-icon {
@@ -90,13 +104,19 @@ body {
     visibility: hidden;
     opacity: 0.5;
     color: white;
-}
+};
+
 
 .tab-close-button:hover {
-    /* border: 1px solid black; */
     opacity: 1.0;
     color: #da3a3a;
 };
+
+/* .tab-close-button:active {
+    opacity: 1.0;
+    color: #631616;
+}; */
+
 /* 
 .tab-close-button:hover {
     border: 1px solid red;
@@ -112,6 +132,23 @@ input:focus {
     font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
     font-size: 14px;
     color: #333333;
+}
+
+#logo {
+    position: absolute;
+    z-index: -1;
+    left: 30px;
+    top: 30px;
+    background-image: url(ht.png);
+    background-size: contain;
+    background-repeat: no-repeat;
+    width: 120px;
+    height: 120px;
+}
+
+.tab-url {
+    font-size: 70%;
+    opacity: 0.7;
 }
 
 /* :focus, input:focus {

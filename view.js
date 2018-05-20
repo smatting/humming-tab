@@ -1,4 +1,4 @@
-document.addEventListener('DOMContentLoaded', function(){ 
+document.addEventListener('DOMContentLoaded', function() { 
     var app = new Vue({
         el: '#tab-view',
         data: {
@@ -40,34 +40,62 @@ document.addEventListener('DOMContentLoaded', function(){
             },
             onSearchInput: function(value) {
                 // console.log('onSearchInput', value);
+                this.keyboardSelectionIndex = 0;
                 this.resortTabs(null, value);
             },
             resortTabs: function(tabs, query) {
+
                 if (_.isNil(tabs)) {
                     tabs = this.tabs;
                 }
-                if ((!_.isNil(query)) && (!_.isEmpty(query))) {
-                    tabs = _.orderBy(tabs, function(tab) {
+
+                let performSearch;
+                if (_.isNil(query)) {
+                    performSearch = false;
+                } else {
+                    query = query.replace(/\s/g, '');
+                    performSearch = (!_.isEmpty(query));
+                }
+                if (performSearch) {
+                    _.forEach(tabs, function(tab) {
                         if (_.isNil(tab.title) || _.isEmpty(tab.title)) {
-                            return 0;
+                            tab.searchScore = 0;
+                            return
                         }
+                        // const url = new URL(tab.url);
+                        // const urlScore_ = doScore(query, url.hostname + url.pathname);
+                        const urlScore_ = doScore(query, tab.url);
+                        const urlScore = _.isNil(urlScore_[0]) ? 0 : urlScore_[0];
 
                         const res = doScore(query, tab.title);
+                        if (res == NO_MATCH) {
+                            tab.searchScore = urlScore;
+                            tab.searchPositions = null;
+                        } else {
+                            tab.searchScore = res[0] + 0.5 * urlScore;
 
-                        return res[0];
-
-                        // // console.log('tab', tab);
-                        // const title = tab.title.toLowerCase();
-                        // // console.log('title', title);
-                        // if (title.includes(query)) {
-                        //     return 1;
-                        // } else {
-                        //     return 0;
-                        // }
-                    },
-                    ["desc"])
+                            tab.searchPositions = res[1];
+                            const highlights = _.map(searchHighlights(res[1], tab.title.length), function(r) {
+                                r.text = tab.title.slice(r.range[0], r.range[1]+1);
+                                return r
+                            });
+                            if (highlights.length > 0) {
+                                tab.highlights = highlights;
+                            } else {
+                                tab.highlights = null;
+                            }
+                            // if (tab.highlights.length > 0) {
+                            //     console.log(tab.highlights);
+                            // }
+                        }
+                    });
+                    tabs = _.orderBy(tabs, 'searchScore', ["desc"]);
                     app.tabs = tabs;
                 } else {
+                    _.forEach(tabs, function(tab) {
+                        tab.searchPositions = null;
+                        tab.highlights = null;
+                    });
                     chrome.storage.local.get({tabsLastActive: {}}, function(data) {
                         var tabsFiltered = _.filter(tabs, function(tab) {return tab.url != window.location.href;});
                         // console.log('tabsFiltered', tabsFiltered);
@@ -97,15 +125,12 @@ document.addEventListener('DOMContentLoaded', function(){
     };
 
     function updateTabView() {
-        document.getElementById('tab-search').focus();
-        document.getElementById('tab-search').addEventListener('blur', function() {
-            document.getElementById('tab-search').focus();
-        });
+        document.getElementById('tab-search').value = '';
 
         app.keyboardSelectionIndex = 0;
 
-        console.log('updateTabView');
-        chrome.tabs.query({}, function(tabs) {
+        // console.log('updateTabView');
+        chrome.tabs.query({currentWindow: true}, function(tabs) {
             app.resortTabs(tabs);
             // chrome.storage.local.get({tabsLastActive: {}}, function(data) {
             //     var tabsFiltered = _.filter(tabs, function(tab) {return tab.url != window.location.href;});
@@ -122,6 +147,7 @@ document.addEventListener('DOMContentLoaded', function(){
     };
 
     const NO_MATCH = 0;
+    const NO_SCORE = 0;
 
     // function computeCharScore(query: string, queryLower: string, queryIndex: number, target: string, targetLower: string, targetIndex: number, matchesSequenceLength: number): number {
     function computeCharScore(query, queryLower, queryIndex, target, targetLower, targetIndex, matchesSequenceLength) {
@@ -168,8 +194,8 @@ document.addEventListener('DOMContentLoaded', function(){
         else {
 
             // After separator bonus
-            // const separatorBonus = scoreSeparatorAtPos(target.charCodeAt(targetIndex - 1));
-            const separatorBonus = 0;
+            const separatorBonus = scoreSeparatorAtPos(target.charCodeAt(targetIndex - 1));
+            // const separatorBonus = 0;
             if (separatorBonus) {
                 score += separatorBonus;
 
@@ -199,23 +225,22 @@ document.addEventListener('DOMContentLoaded', function(){
     // function scoreSeparatorAtPos(charCode: number): number {
     function scoreSeparatorAtPos(charCode) {
         switch (charCode) {
-            case CharCode.Slash:
-            case CharCode.Backslash:
+            case 47: // CharCode.Slash:
+            case 92: // CharCode.Backslash:
                 return 5; // prefer path separators...
-            case CharCode.Underline:
-            case CharCode.Dash:
-            case CharCode.Period:
-            case CharCode.Space:
-            case CharCode.SingleQuote:
-            case CharCode.DoubleQuote:
-            case CharCode.Colon:
+            case 95: // CharCode.Underline:
+            case 45: // CharCode.Dash:
+            case 46: // CharCode.Period:
+            case 32: // CharCode.Space:
+            case 39: // CharCode.SingleQuote:
+            case 34: // CharCode.DoubleQuote:
+            case 58: // CharCode.Colon:
                 return 4; // ...over other separators
             default:
                 return 0;
         }
     }
 
-    // function doScore(query: string, queryLower: string, queryLength: number, target: string, targetLower: string, targetLength: number): [number, number[]] {
     function doScore(query, target) {
 
         const targetLength = target.length;
@@ -357,6 +382,43 @@ document.addEventListener('DOMContentLoaded', function(){
     });
 
     updateTabView();
+
+    function searchHighlights(searchPositions, stringLength) {
+        const l = searchPositions;
+        const n = stringLength;
+
+        if (l.length == 0) {
+            return [];
+        }
+        const mids =_.filter(_.zip(l, _.tail(l)), function(pair) {
+            return !_.isNil(pair[0]) && !_.isNil(pair[1]) && pair[0] + 1 != pair[1];
+        });
+        const selectedRanges_ = _.chunk(_.concat(l[0], _.flatten(mids), l[l.length-1]), 2);
+        const selectedRanges = _.map(selectedRanges_, function(pair) { return {type: 'Selection', range: pair} }); 
+
+        const interRanges_ = _.map(mids, function(pair) { return [pair[0] + 1, pair[1] - 1]; });
+        const interRanges__ = _.concat(
+            [[0, selectedRanges_[0][0]-1]],
+            interRanges_,
+            [[selectedRanges_[selectedRanges_.length-1][1]+1, n-1]])
+        const interRanges = _.map(interRanges__, function(pair) { return {type: 'NonSelection', range: pair} }); 
+
+        const validIndex = function(i) { return 0 <= i && i < n };
+        const validRange = function(pair) { return validIndex(pair[0]) && validIndex(pair[1]) && pair[0] <= pair[1] }
+
+        const allRanges_ = _.flatten(_.zip(interRanges, selectedRanges));
+        const allRanges = _.filter(allRanges_, function(r) {
+            if (_.isNil(r)) {
+                return false;
+            }
+            return validRange(r.range);
+        });
+
+        return allRanges;
+    };
+
+    // console.log(searchHighlights([0, 1, 9, 10, 11, 14], 32))
+    
 
     // const r = doScore("tef ma", "stefan matting");
     // console.log('r', r);

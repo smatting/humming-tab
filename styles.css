@@ -1,5 +1,15 @@
 body {
-    background: #f6f6f6;
+    /* background: linear-gradient(#326b96,#2c3459); */
+    /* background: linear-gradient(#94c6eb,#7485c2); */
+    /* background: linear-gradient(#f08218,#7485c2); */
+    /* background: linear-gradient(#f08218,#7485c2); */
+
+    /* background: linear-gradient(#326b96,#7d1959); */
+    background: linear-gradient(#454b65,#803966);
+    /* background: linear-gradient(#803966, #454b65); */
+
+
+
     color: #202020;
 }
 
@@ -8,6 +18,7 @@ body {
     margin-top: 40px;
     margin-left: auto;
     margin-right: auto;
+    background: #f6f6f6;
 }
 
 #tab-view ol {
@@ -32,27 +43,18 @@ body {
 
 .tab-title {
     display: inline-block;
-    /* display: table-cell; */
     white-space: nowrap;
-    /* text-overflow: ellipsis; */
-
-
-    /* text-overflow: ellipsis; */
-    /* width: 30%;
-    max-width: 30%; */
-    /* line-height: 1.7em; */
     padding: 0.5em 0px;
 }
+
 .tab:hover {
      background-color: #d9e1eb;
-     /* border-radius: 5px; */
-    /* background-color:#dcbc83; */
 }
 
 .tab.selected {
      background-color: #b6d2f7;
-     /* border-radius: 5px; */
-    /* background-color:#dcbc83; */
+     /* background-color: #aab5e7; */
+     /* background-color: #f0c9a3; */
 }
 
 .tab-icon-wrap {
@@ -62,12 +64,12 @@ body {
 }
 
 .highlight {
-    /* font-weight: bold; */
-    /* background-color: rgba(0, 0, 0, 0.3); */
-    /* font-weight: bold; */
-    /* text-decoration: underline; */
-    color: green;
-    /* border-radius: 5px; */
+    color: #cb166f;
+    /* color: #f08218; */
+}
+
+.tab:hover .tab-close-button {
+    visibility: visible;
 }
 
 .tab-icon {
@@ -79,48 +81,23 @@ body {
     background-size: contain;
 }
 
-.tab:hover .tab-close-button {
-    visibility: visible;
+
+.tab-close-button:hover {
+    opacity: 1.0;
+    color: #f55600;
 }
 
 .tab-close-button {
     display: table-cell;
     width: 30px;
     text-align: center;
-
-    /* border: 1px solid green; */
     margin-right: 10px;
-    /* width: 100px; */
-
-    /* vertical-align: center;
-    height: 2.7em; */
     height: 100%;
-    /* padding: 0px 20px; */
-    /* vertical-align: center; */
-
-
-    /* margin-left: 6px;
-    margin-right: 16px; */
     visibility: hidden;
     opacity: 0.5;
     color: white;
-};
+}
 
-
-.tab-close-button:hover {
-    opacity: 1.0;
-    color: #da3a3a;
-};
-
-/* .tab-close-button:active {
-    opacity: 1.0;
-    color: #631616;
-}; */
-
-/* 
-.tab-close-button:hover {
-    border: 1px solid red;
-}; */
 input:focus {
     outline: none;
 }
@@ -135,22 +112,31 @@ input:focus {
 }
 
 #logo {
+    cursor: pointer;
     position: absolute;
     z-index: -1;
     left: 30px;
     top: 30px;
-    background-image: url(ht.png);
-    background-size: contain;
+
+    width: 200px;
+    height: 200px;
+
+    background-image: url(hummingbird-flaps.png);
+    background-size: cover;
     background-repeat: no-repeat;
+    
+    background-position-x: 0%;
     width: 120px;
     height: 120px;
+    z-index: 2;
+}
+
+#logo:hover {
+    background-position-x: 100%;
+    border: none;
 }
 
 .tab-url {
     font-size: 70%;
     opacity: 0.7;
 }
-
-/* :focus, input:focus {
-    outline: none !important;
-} */

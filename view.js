@@ -3,6 +3,7 @@ document.addEventListener('DOMContentLoaded', function() {
         el: '#tab-view',
         data: {
             message: 'Hello Vue!',
+            showHelp: false,
             tabs: [],
             keyboardSelectionIndex: 0
         },
@@ -41,7 +42,12 @@ document.addEventListener('DOMContentLoaded', function() {
             onSearchInput: function(value) {
                 // console.log('onSearchInput', value);
                 this.keyboardSelectionIndex = 0;
-                this.resortTabs(null, value);
+                if (value == "?") {
+                    this.showHelp = true;
+                } else {
+                    this.showHelp = false;
+                    this.resortTabs(null, value);
+                }
             },
             resortTabs: function(tabs, query) {
 
@@ -343,16 +349,6 @@ document.addEventListener('DOMContentLoaded', function() {
         return [scores[queryLength * targetLength - 1], positions.reverse()];
     }
 
-    // function tabOnCreated(tab) {
-    //     console.log('tabOnCreated', tab);
-    //     chrome.storage.local.get({tabs: {}}, function(data) {
-    //         data.tabs[tab.id] = tab;
-    //         console.log('after setting', data.tabs);
-    //         chrome.storage.local.set({tabs: data.tabs}, function() { updateTabView(); })
-    //     })
-    // };
-    // chrome.tabs.onCreated.addListener(tabOnCreated);
-
     chrome.runtime.onMessage.addListener(function(message, sender) {
         // console.log('We read you', message);
         updateTabView();
@@ -416,11 +412,4 @@ document.addEventListener('DOMContentLoaded', function() {
 
         return allRanges;
     };
-
-    // console.log(searchHighlights([0, 1, 9, 10, 11, 14], 32))
-    
-
-    // const r = doScore("tef ma", "stefan matting");
-    // console.log('r', r);
-
 }, false);

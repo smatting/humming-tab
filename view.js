@@ -131,6 +131,7 @@ document.addEventListener('DOMContentLoaded', function() {
     };
 
     function updateTabView() {
+        console.log('updateTabView()');
         document.getElementById('tab-search').value = '';
 
         app.keyboardSelectionIndex = 0;
@@ -350,8 +351,15 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     chrome.runtime.onMessage.addListener(function(message, sender) {
-        // console.log('We read you', message);
-        updateTabView();
+        console.log('Got message', message);
+        if (message.type == 'ACTIVATE_TAB_VIEW') {
+            // app.keyboardSelectionIndex = 0;
+            updateTabView();
+        }
+        if (message.type == 'REFRESH_TAB_VIEW') {
+            app.moveKeyboardSelection(1);
+            // updateTabView();
+        }
     });
 
     window.addEventListener("keydown", function(e) {
@@ -412,4 +420,16 @@ document.addEventListener('DOMContentLoaded', function() {
 
         return allRanges;
     };
+    
+    chrome.commands.getAll(function(commands) {
+        if (commands.length > 0) {
+            const shortcut = commands[0].shortcut;
+            if (shortcut != '') {
+                app.shortcut = shortcut;
+                return
+            }
+        }
+        app.shortcut = undefined;
+    });
+
 }, false);

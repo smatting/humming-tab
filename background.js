@@ -1,59 +1,28 @@
 
-function openTab() {
-  chrome.tabs.create({url: "tabs.html", pinned: true}, function(tab) {
-    chrome.storage.local.set({tabsTabId: tab.id});
-  });
+function makeTab() {
+  chrome.tabs.create({url: "tabs.html", pinned: true});
 }
 
 function openSearch() {
-  chrome.tabs.query({url:"chrome-extension://*/tabs.html", currentWindow: true}, function(tabs) {
+
+  chrome.tabs.query({highlighted: true, currentWindow: true}, function(activeTabs) {
+    chrome.tabs.query({url:"chrome-extension://*/tabs.html", currentWindow: true}, function(tabs) {
     if (tabs.length > 0) {
-      const tab = tabs[0];
-      chrome.tabs.highlight({tabs: [tab.index], windowId: tab.windowId});
-      chrome.runtime.sendMessage(null, {"bottle": "send nudes"});
+      const hummingTab = tabs[0];
+      if ((activeTabs.length > 0) && (activeTabs[0].id == hummingTab.id)) {
+        chrome.runtime.sendMessage(null, {"type": "REFRESH_TAB_VIEW"});
+      } else {
+        chrome.tabs.highlight({tabs: [hummingTab.index], windowId: hummingTab.windowId}, function() {
+          chrome.runtime.sendMessage(null, {"type": "ACTIVATE_TAB_VIEW"});
+        });
+      }
     } else {
-      openTab();
+      makeTab();
     }
-  })
-
-  // chrome.storage.local.get({tabsTabId: null}, function(data) {
-
-
-  //   if (data.tabsTabId) {
-  //     // chrome.tabs.highlight({tabs: 1});
-  //     chrome.tabs.get(data.tabsTabId, function(tab) {
-  //       if (tab) {
-  //         // console.log("found tab", tab);
-  //         chrome.tabs.highlight({tabs: [tab.index]});
-
-  //         // console.log('houston you read me?');
-  //         chrome.runtime.sendMessage(null, {"bottle": "send nudes"});
-
-  //       } else {
-  //         openTab();
-  //       }
-  //       // tab.windowId
-  //       // tab.index
-  //     });
-  //   } else {
-  //     openTab();
-  //   }
-  //   // console.log('stored tab id', data);
-  // });
-  // const extensionId = chrome.i18n.getMessage("@@extension_id");
-  // const urlPattern = "chrome-extension://" + extensionId + "/tabs.html";
-  // const urlPattern = "*://*/tabs.html";
-  // const urlPattern = "*://*/*";
-  // chrome.tabs.query({}, function (tabs) {
-  //   console.log('tabs', tabs);
-  // });
+    })   
+  });
 
 
-  // chrome-extension://kdaoofjgkmolaccnhjeckkghlgknggif/tabs.html
-  // console.log('id', id);
-  
-  // chrome.tabs.create({url: "tabs.html"});
-  // chrome.tabs.highlight({tabs: 1});
 }
 
 function updateTabView() {

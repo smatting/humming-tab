@@ -4,6 +4,7 @@ document.addEventListener('DOMContentLoaded', function() {
         data: {
             message: 'Hello Vue!',
             showHelp: false,
+            searchInput: '',
             tabs: [],
             keyboardSelectionIndex: 0
         },
@@ -19,6 +20,19 @@ document.addEventListener('DOMContentLoaded', function() {
                 chrome.tabs.remove(tabId, function() {
                     // console.log('tabs inside closeTab', that.tabs);
                     that.tabs = _.filter(that.tabs, function(tab) {return tab.id !== tabId});
+                });
+            },
+            closeTabsOlderThan: function(secs) {
+                const that = this;
+                chrome.storage.local.get({tabsLastActive: {}}, function(data) {
+                    const now = (+ new Date());
+                    const tabAge = timeSinceLastActive(now, data.tabsLastActive);
+                    var tabsToClose = _.filter(that.tabs, function(tab) {
+                        return (tabAge(tab) / 1000 > secs) && tab.url != window.location.href;
+                    });
+                    _.forEach(tabsToClose, function(tab) {
+                        that.closeTab(tab.id);
+                    });
                 });
             },
             switchToTab: function(tabid) {
@@ -42,6 +56,9 @@ document.addEventListener('DOMContentLoaded', function() {
             onSearchInput: function(value) {
                 // console.log('onSearchInput', value);
                 this.keyboardSelectionIndex = 0;
+                if (value.startsWith('!')) {
+                    return;
+                }
                 if (value == "?") {
                     this.showHelp = true;
                 } else {
@@ -351,7 +368,8 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     chrome.runtime.onMessage.addListener(function(message, sender) {
-        console.log('Got message', message);
+        // console.log('Got message', message);
+        document.getElementById('tab-search').focus();
         if (message.type == 'ACTIVATE_TAB_VIEW') {
             // app.keyboardSelectionIndex = 0;
             updateTabView();
@@ -374,16 +392,28 @@ document.addEventListener('DOMContentLoaded', function() {
             e.stopPropagation();
             app.moveKeyboardSelection(1);
         }
+        // ENTER
         if (e.keyCode == 13) {
-            app.switchToSelectedTab();
+            if (app.searchInput.startsWith('!')) {
+                const regex = /!\s*close (\d+)(h|m|d)/g;
+                const match = regex.exec(app.searchInput);
+                if (match) {
+                    document.getElementById('tab-search').select();
+                    const secsUnit = {h: 60*60, m: 60, d: 24*60*60}[match[2]];
+                    const secs = parseInt(match[1]) * secsUnit;
+                    app.closeTabsOlderThan(secs);
+                }
+            } else {
+                app.switchToSelectedTab();
+            }
         }
     });
 
 
     document.getElementById('tab-search').focus();
-    document.getElementById('tab-search').addEventListener('blur', function() {
-        document.getElementById('tab-search').focus();
-    });
+    // document.getElementById('tab-search').addEventListener('blur', function() {
+    //     document.getElementById('tab-search').focus();
+    // });
 
     updateTabView();
 

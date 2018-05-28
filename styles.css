@@ -112,8 +112,8 @@ input:focus {
 }
 
 #logo {
-    cursor: pointer;
-    position: absolute;
+    /* cursor: pointer;
+    position: absolute; */
     z-index: -1;
     left: 30px;
     top: 30px;

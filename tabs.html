@@ -9,14 +9,12 @@
         <link rel="stylesheet" href="css/fa-solid.css">
     </head>
     <body>
-        <div id="logo"></div>
         <div id="tab-view">
-            <input id="tab-search" type="text" v-on:input='onSearchInput($event.target.value)'  spellcheck="false" placeholder="Type '?' to get help">
-            <ol v-if="showHelp">
-                <li>erstes</li>
-                <li>zweites</li>
-                <li>dritter</li>
-            </ol>
+            <input id="tab-search" type="text" v-model="searchInput" v-on:input='onSearchInput($event.target.value)'  spellcheck="false" placeholder="Type '?' to get help">
+            <div v-if="showHelp">
+                <p>erstes</p>
+                <div id="logo"></div>
+            </div>
             <ol v-if="!showHelp">
                 <li v-for="(tab, index) in tabs" v-bind:class="{tab: true, selected: index == keyboardSelectionIndex}" v-on:click="switchToTab(tab.id)" >
                     <span class="tab-close-button" v-on:click.stop="closeTab(tab.id)"><i class="fas fa-times-circle"></i></span>

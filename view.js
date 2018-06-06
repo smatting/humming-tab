@@ -28,7 +28,7 @@ document.addEventListener('DOMContentLoaded', function() {
                     const now = (+ new Date());
                     const tabAge = timeSinceLastActive(now, data.tabsLastActive);
                     var tabsToClose = _.filter(that.tabs, function(tab) {
-                        return (tabAge(tab) / 1000 > secs) && tab.url != window.location.href;
+                        return (tabAge(tab) / 1000 > secs) && tab.url != window.location.href && !tab.pinned;
                     });
                     _.forEach(tabsToClose, function(tab) {
                         that.closeTab(tab.id);
@@ -149,7 +149,9 @@ document.addEventListener('DOMContentLoaded', function() {
 
     function updateTabView() {
         console.log('updateTabView()');
-        document.getElementById('tab-search').value = '';
+
+        // document.getElementById('tab-search').value = '';
+        app.searchInput = '';
 
         app.keyboardSelectionIndex = 0;
 
@@ -371,11 +373,13 @@ document.addEventListener('DOMContentLoaded', function() {
         // console.log('Got message', message);
         document.getElementById('tab-search').focus();
         if (message.type == 'ACTIVATE_TAB_VIEW') {
+            console.log('ACTIVATE_TAB_VIEW');
             // app.keyboardSelectionIndex = 0;
             updateTabView();
         }
         if (message.type == 'REFRESH_TAB_VIEW') {
             app.moveKeyboardSelection(1);
+            console.log('REFRESH_TAB_VIEW');
             // updateTabView();
         }
     });
